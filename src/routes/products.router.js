@@ -8,9 +8,9 @@ productsRouter.get("/:pid", async (req, res) => {
     try {
         const pid = req.params.pid;
         const product = await Product.findById(pid);
-        res.status(200).json({message:"producto encontrado", product});
+        res.status(200).json({status:"success", payload: product});
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({status:"error", message: error.message});
     }
 })
 

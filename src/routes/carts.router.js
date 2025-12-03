@@ -14,6 +14,17 @@ cartsRouter.get("/:cid", async (req, res)=>{
     }
 })
 
+cartsRouter.post("/", async (req, res) => {
+    try {
+        const newCart = req.body;
+        const cart = new Cart(newCart); //instancia local
+        await cart.save();//sincronizamos
+        res.status(201).json({status:"success", payload: cart});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
+
 cartsRouter.post("/:cid/product/:pid", async(req , res)=>{
     try {
         const {cid, pid} = req.params;
