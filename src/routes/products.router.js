@@ -4,6 +4,39 @@ import uploader from "../utils/uploader.js";
 
 const productsRouter = express.Router();
 
+productsRouter.get("/:pid", async (req, res) => {
+    try {
+        const pid = req.params.pid;
+        const product = await Product.findById(pid);
+        res.status(200).json({message:"producto encontrado", product});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
+
+productsRouter.put("/:pid", uploader.single("thumbnails"), async (req, res)=>{
+    try {
+        const pid = req.params.pid;
+        const updates = req.body;
+
+        //si la actualizacion es img
+        if (req.file) { 
+            updates.thumbnails = [`/images/${req.file.filename}`]; 
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(pid, updates, {new:true});
+
+        //agregar validacion de si no manda null
+        if (!updatedProduct) {
+            return res.status(404).json({ status: "error", message: `Producto con ID ${pid} no encontrado.` });
+        }
+
+        res.status(200).json({status:"success", payload:updatedProduct});
+    } catch (error) {
+        res.status(500).json({status:"error", message: error.message});
+    }
+})
+
 productsRouter.get("/", async(req, res)=>{
     try {
         const {limit=10, page=1, category, available, sort} = req.query;
